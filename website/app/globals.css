@@ -238,3 +238,12 @@ body {
   color: rgb(255 255 255 / 0.3);
   pointer-events: none;
 }
+
+/* Touch screens get a read-only note (editor.tsx), where an empty line is only a gap. Hidden
+   from the first paint: it used to collapse at hydration, shrinking the page and flashing a
+   scrollbar on load. */
+@media (pointer: coarse) {
+  [data-line]:has(.note-block:empty) {
+    display: none;
+  }
+}
