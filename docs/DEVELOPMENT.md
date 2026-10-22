@@ -69,6 +69,30 @@ your saved settings, for example `-hideFromScreenSharing YES`.
 windows while you keep working. Combine it with the flags above, for example
 `JOT_OPEN_MENU=/ JOT_MENU_DOWN=12`, to check a menu's state without typing into the app.
 
+## Releasing
+
+Releases follow Hun's pipeline: a notarized, drag-to-install DMG on GitHub Releases, plus an
+EdDSA-signed Sparkle `appcast.xml` that installed copies check once a day
+(Jot → Check for Updates…).
+
+- `scripts/package-release.sh --version X.Y.Z --build N [--generate-appcast]` builds the
+  app, signs Sparkle's helpers inside-out and then Jot.app with Developer ID and the hardened
+  runtime, builds the DMG (`assets/dmg`, background from `scripts/render-dmg-background.swift`),
+  signs it, notarizes and staples it, and writes the appcast. Notary credentials come from
+  `JOT_NOTARY_KEY_PATH` / `JOT_NOTARY_KEY_ID` / `JOT_NOTARY_ISSUER_ID` (an App Store Connect
+  API key) or `--notary-profile`. The build number must grow with every release.
+- It refuses to package a build without Raycast's icons, so a release looks exactly like the
+  app you test.
+- Pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`, which does the same on a
+  macOS 26 runner and publishes the GitHub release. It needs a `Production` environment with
+  the secrets `DEVELOPER_ID_P12_BASE64`, `DEVELOPER_ID_P12_PASSWORD`, `NOTARY_KEY_P8_BASE64`,
+  `SPARKLE_ED_PRIVATE_KEY` and the variables `APPLE_TEAM_ID`, `NOTARY_KEY_ID`,
+  `NOTARY_ISSUER_ID`.
+- The Sparkle signing key lives in the login keychain under the account `jot`; its public half
+  is `SUPublicEDKey` in `scripts/bundle.sh`. Export it for CI with
+  `.build/artifacts/sparkle/Sparkle/bin/generate_keys --account jot -x key.txt`.
+- The app icon is rendered by `scripts/render-app-icon.swift` into `assets/AppIcon.icns`.
+
 ## Matching Raycast
 
 Most values in `docs/DESIGN.md` were read from Raycast.app's shipped frontend
