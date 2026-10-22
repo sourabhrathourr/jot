@@ -96,8 +96,9 @@ your Mac.
 
 - [docs/DESIGN.md](docs/DESIGN.md): how Jot matches Raycast Notes (colours, typography,
   window, menus, the slash menu, data) and how the code is organised.
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): building, testing, dev flags and taking
-  screenshots for comparisons.
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): building, testing, dev flags, screenshots for
+  comparisons, and releasing (signing, notarization, the DMG and updates).
+- [website/](website): the site at [getjot.vercel.app](https://getjot.vercel.app).
 
 ## Contributing
 
