@@ -1,0 +1,3 @@
+import JotKit
+
+JotApp.run()
