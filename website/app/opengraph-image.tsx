@@ -36,12 +36,20 @@ function Check() {
 }
 
 /**
- * The link preview: the product as the picture. A Jot window on flat near-black, cropped by the
- * bottom edge like a product shot, holding the same note as the website. No gradients, no glows.
+ * The link preview: the product as the picture. A Jot window of dark frosted glass on a warm
+ * off-white, cropped by the bottom edge like a product shot, holding the same note as the
+ * website. Two crisp shapes sit half behind it: outside they're sharp, through the glass they're
+ * the blurred copy from scripts/render-og-backdrop.swift (Satori can't blur live).
  */
 export default async function OpenGraphImage() {
   const font = (weight: number) => readFile(join(process.cwd(), `assets/fonts/Inter-${weight}.ttf`));
   const [regular, medium, semibold] = await Promise.all([font(400), font(500), font(600)]);
+  const image = async (name: string) =>
+    `data:image/png;base64,${(await readFile(join(process.cwd(), `assets/og/${name}.png`))).toString("base64")}`;
+  const [backdrop, frosted] = await Promise.all([image("backdrop"), image("backdrop-frosted")]);
+  // Where the window sits on the canvas, so the frosted copy lines up with the backdrop.
+  const windowX = 120;
+  const windowY = 156;
 
   return new ImageResponse(
     (
@@ -49,17 +57,20 @@ export default async function OpenGraphImage() {
         style={{
           display: "flex",
           flexDirection: "column",
+          position: "relative",
           width: "100%",
           height: "100%",
-          background: "#0b0b0b",
+          background: "#f3f2ef",
           fontFamily: "Inter",
-          padding: "0 120px",
+          padding: `0 ${windowX}px`,
         }}
       >
+        <img src={backdrop} width={1200} height={630} alt="" style={{ position: "absolute", left: 0, top: 0 }} />
+
         {/* The brand, aligned with the window's edge */}
-        <div style={{ display: "flex", alignItems: "center", height: 156 }}>
+        <div style={{ display: "flex", alignItems: "center", height: windowY }}>
           <img src={mark} width={38} height={38} alt="" />
-          <div style={{ marginLeft: 13, fontSize: 27, fontWeight: 600, color: "#ededed", letterSpacing: -0.4 }}>Jot</div>
+          <div style={{ marginLeft: 13, fontSize: 27, fontWeight: 600, color: "#1c1c1e", letterSpacing: -0.4 }}>Jot</div>
         </div>
 
         {/* The window */}
@@ -67,12 +78,33 @@ export default async function OpenGraphImage() {
           style={{
             display: "flex",
             flexDirection: "column",
+            position: "relative",
             height: 600,
             borderRadius: 26,
-            background: "#161616",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
+            overflow: "hidden",
+            boxShadow: "0 24px 60px -12px rgba(0, 0, 0, 0.35)",
           }}
         >
+          {/* The glass: the blurred world behind, a dark tint, and a bright rim. */}
+          <img
+            src={frosted}
+            width={1200}
+            height={630}
+            alt=""
+            style={{ position: "absolute", left: -windowX, top: -windowY }}
+          />
+          <div style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, background: "rgba(20, 20, 22, 0.86)" }} />
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: 26,
+              border: "1.5px solid rgba(255, 255, 255, 0.22)",
+            }}
+          />
           <div style={{ display: "flex", position: "relative", alignItems: "center", justifyContent: "center", height: 58 }}>
             <div style={{ display: "flex", position: "absolute", left: 22, top: 22 }}>
               {["#ff5f57", "#febc2e", "#28c840"].map((color) => (
