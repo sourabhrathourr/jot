@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var hotKey: GlobalHotKey?
     private var settings: SettingsWindowController?
+    private let updater = JotUpdater()
     private var openItem: NSMenuItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -78,6 +79,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         new.target = controller
         menu.addItem(new)
         menu.addItem(.separator())
+        let updatesItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates(_:)), keyEquivalent: "")
+        updatesItem.target = self
+        menu.addItem(updatesItem)
         let settingsItem = NSMenuItem(title: "Settings…", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
@@ -89,6 +93,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func openNotes() { controller?.show() }
 
     @objc private func showSettings() { settings?.show() }
+
+    /// From the Jot menu (through the responder chain) and the menu bar icon.
+    @objc func checkForUpdates(_ sender: Any?) { updater.checkForUpdates() }
+
+    @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        menuItem.action == #selector(checkForUpdates(_:)) ? updater.canCheckForUpdates : true
+    }
 
     /// Settings changes the global shortcut through the one `GlobalHotKey`.
     private func installSettings(controller: NotesWindowController) {

@@ -27,6 +27,7 @@ enum MainMenu {
         submenu("Jot", [
             item("About Jot", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), target: nil),
             sep(),
+            item("Check for Updates…", #selector(AppDelegate.checkForUpdates(_:)), target: nil),
             item("Settings…", #selector(C.showSettings(_:)), ","),
             sep(),
             item("Hide Jot", #selector(NSApplication.hide(_:)), "h", target: nil),

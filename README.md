@@ -36,6 +36,7 @@ AppKit and TextKit 2 instead of a web view.
   default; find it in Settings, the Action Panel (⌘K) or the View menu.
 - **Find (⌘F), zoom, a format bar, copy as Markdown, HTML or plain text, export, and
   `jot://` deeplinks.**
+- **Updates built in:** Jot checks for new versions once a day (or Jot → Check for Updates…).
 - **Your data stays on your Mac** in a single SQLite database, in the same shape as Raycast's
   notes table.
 
