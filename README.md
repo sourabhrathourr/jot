@@ -4,7 +4,8 @@
 Raycast Notes, rebuilt from scratch as a fully native app. Unlimited notes, images included,
 no account, open source.
 
-Press **⇧⌘N** anywhere, write, and press it again to get back to what you were doing.
+Press **⇧⌘N** anywhere (or your own shortcut), write, and press it again to get back to what
+you were doing.
 
 ## Why
 
@@ -28,6 +29,11 @@ AppKit and TextKit 2 instead of a web view.
   locally next to your notes.
 - **Action Panel (⌘K) and Browse Notes (⌘P)**, with search, pinned notes and recently deleted
   notes.
+- **Your own shortcut:** change ⇧⌘N in Settings (⌘,) to anything, including Raycast's Hyper
+  Key (`✦`). It wins over apps' own shortcuts, so a browser's ⇧⌘N won't fire while Jot uses it.
+- **Hide from Screen Sharing:** one toggle keeps Jot out of screen shares, recordings and
+  screenshots while it stays on your screen, so it works as speaker notes on a call. Off by
+  default; find it in Settings, the Action Panel (⌘K) or the View menu.
 - **Find (⌘F), zoom, a format bar, copy as Markdown, HTML or plain text, export, and
   `jot://` deeplinks.**
 - **Your data stays on your Mac** in a single SQLite database, in the same shape as Raycast's
@@ -45,7 +51,8 @@ make install   # builds Jot.app and copies it to /Applications
 open /Applications/Jot.app
 ```
 
-Jot lives in the menu bar, not the Dock. Press **⇧⌘N** to show or hide it.
+Jot lives in the menu bar, not the Dock. Press **⇧⌘N** to show or hide it, and open
+**Settings…** from the menu bar icon or with ⌘, to choose another shortcut.
 
 > Jot's menus use Raycast's icons. If Raycast is installed, the build copies them from your
 > own Raycast.app; they're never stored in this repository. Without Raycast, Jot uses
@@ -55,7 +62,8 @@ Jot lives in the menu bar, not the Dock. Press **⇧⌘N** to show or hide it.
 
 | Action | Key |
 |---|---|
-| Show or hide Jot (anywhere) | ⇧⌘N |
+| Show or hide Jot (anywhere) | ⇧⌘N, or your own in Settings |
+| Settings | ⌘, |
 | New note | ⌘N |
 | Browse notes | ⌘P |
 | Action panel | ⌘K |
@@ -71,6 +79,9 @@ Jot lives in the menu bar, not the Dock. Press **⇧⌘N** to show or hide it.
 | Add image | ⇧⌘I |
 | Copy note as… / Export… | ⇧⌘C / ⇧⌘E |
 | Zoom in / out / actual size | ⌘= / ⌘- / ⌘0 |
+
+Hide from Screen Sharing has no shortcut: turn it on in Settings, the Action Panel (⌘K) or
+View → Hide from Screen Sharing.
 
 The full list is in [docs/DESIGN.md](docs/DESIGN.md#behaviour-and-shortcuts).
 

@@ -27,6 +27,8 @@ enum MainMenu {
         submenu("Jot", [
             item("About Jot", #selector(NSApplication.orderFrontStandardAboutPanel(_:)), target: nil),
             sep(),
+            item("Settings…", #selector(C.showSettings(_:)), ","),
+            sep(),
             item("Hide Jot", #selector(NSApplication.hide(_:)), "h", target: nil),
             item("Quit Jot", #selector(NSApplication.terminate(_:)), "q", target: nil),
         ])
@@ -95,9 +97,9 @@ enum MainMenu {
         submenu("View", [
             item("Show Format Bar", #selector(C.toggleFormatBar(_:)), ",", [.command, .option]),
             item("Auto-Size Window", #selector(C.toggleAutoSize(_:)), "/", [.command, .shift]),
+            item("Hide from Screen Sharing", #selector(C.toggleScreenSharing(_:))),
             sep(),
             item("Zoom In", #selector(C.zoomIn(_:)), "="),
-            item("Hide from Screen Sharing", #selector(C.toggleScreenSharing(_:))),
             item("Zoom Out", #selector(C.zoomOut(_:)), "-"),
             item("Actual Size", #selector(C.resetZoom(_:)), "0"),
         ])

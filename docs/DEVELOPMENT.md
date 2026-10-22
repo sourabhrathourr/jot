@@ -53,16 +53,17 @@ JOT_DB=/tmp/jot-test.db JOT_EMPTY=1 JOT_OPEN_MENU=/ build/Jot.app/Contents/MacOS
 | `JOT_DEMO=1` | open the block-type showcase note |
 | `JOT_OPEN_MENU=actions\|browse\|format\|/query` | open that menu after launch (`/query` types it into the note) |
 | `JOT_MENU_DOWN=n` | press ↓ n times in that menu (scroll checks) |
+| `JOT_OPEN_SETTINGS=1` | open Settings after launch |
 | `JOT_HOVER=1` | show the hovered chrome (buttons, traffic lights) |
 | `JOT_SCROLL=y` | scroll the note to `y` after launch |
 | `JOT_FRAME=x,y,w,h` | pin the window (top-left coordinates) for screenshot comparisons |
 | `JOT_TOAST=title` | show a success toast one second after launch |
 | `JOT_NO_HEADER_BLUR=1` | leave out the header's progressive blur (A/B comparisons) |
 
-## Screenshots without touching your screen
 Any `UserDefaults` key can be overridden for one run with a launch argument, without changing
 your saved settings, for example `-hideFromScreenSharing YES`.
 
+## Screenshots without touching your screen
 
 `screencapture -l <window id>` (or `-R x,y,w,h` for a window and its menus) captures Jot's
 windows while you keep working. Combine it with the flags above, for example

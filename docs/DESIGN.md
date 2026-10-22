@@ -118,11 +118,46 @@ utility):
   the icons line up with the `/`, and flips above when there's no room below. It has no
   animation, and the editor keeps focus. While it shows, the window keeps its height.
 
+### Hide from Screen Sharing
+
+Not in Raycast Notes; Jot's own addition. When it's on, every Jot window (the notes panel,
+the menus and the link popover) gets `NSWindow.sharingType = .none`. Windows like that are
+left out of ScreenCaptureKit captures (Zoom, Google Meet, Teams, QuickTime, the macOS
+screenshot tools) and `screencapture`, but stay visible on your own screen. It's off by
+default and stored in `UserDefaults` (`hideFromScreenSharing`). The toggle lives with the
+other window settings in the Action Panel, and in the View menu with a checkmark. System
+windows Jot opens (Quick Look, the save panel) are drawn by macOS and stay visible.
+
+### Settings and the global shortcut
+
+Not in Raycast Notes as such (Raycast sets a hotkey per command in its own Settings); Jot's
+Settings window (⌘,, or Settings… in the menu bar icon) holds:
+
+- **Show or Hide Jot**, ⇧⌘N by default. A recorder modelled on Raycast's
+  `keyboard-shortcut-recorder`: click it, press keys (held modifiers show as you press them),
+  ⎋ cancels, ⌫ removes the shortcut, and ↺ resets to ⇧⌘N. A shortcut needs ⌘, ⌥ or ⌃, except
+  on function keys. The current shortcut is paused while recording, so pressing it records.
+- It's registered with `RegisterEventHotKey`, which delivers the keys to Jot before the
+  frontmost app sees them, so it wins over apps' own shortcuts. The user's choice always wins
+  in Jot too: a clash with Raycast's main hotkey or an enabled macOS shortcut
+  (`CopySymbolicHotKeys`) is saved anyway, with a yellow hint about where to turn the other
+  one off. Only a shortcut macOS refuses outright keeps the previous one.
+- **Hyper Key.** Raycast's Hyper Key setting is read from Raycast's preferences
+  (`com.raycast.macos.v1` → `raycast_hyperKey_state`: `enabled`, `keyCode`, `includeShiftKey`).
+  When it's on, Settings says which key it is and offers "Use ✦ N". Hyper reaches apps as
+  ⌃⌥⇧⌘ (or ⌃⌥⌘ without Shift) whichever tool provides it (Raycast, Karabiner, Hyperkey), so
+  those combinations are drawn as one `✦` keycap, like Raycast does.
+- **Hide from Screen Sharing** (see above).
+
+The shortcut is stored in `UserDefaults` as `globalHotKey` (`keyCode` and modifier flags; a
+`keyCode` of -1 means no shortcut).
+
 ## Behaviour and shortcuts
 
 | Action | Key |
 |---|---|
-| Show or hide Jot (global) | ⇧⌘N |
+| Show or hide Jot (global) | ⇧⌘N, configurable in Settings |
+| Settings | ⌘, |
 | New note / Duplicate note | ⌘N / ⌘D |
 | Browse notes / Action panel | ⌘P / ⌘K |
 | Go back / Go forward | ⌘[ / ⌘] |
@@ -140,6 +175,7 @@ utility):
 | Format… / Show format bar | ⇧⌘, / ⌥⌘, |
 | Move list item up / down | ⌃⌘↑ / ⌃⌘↓ |
 | Auto-size window | ⇧⌘/ |
+| Hide from screen sharing | ⌘K or View menu (no shortcut) |
 | Zoom in / out / actual size | ⌘= / ⌘- / ⌘0 |
 | Line break | ⇧↩ |
 
@@ -175,7 +211,6 @@ implements that design locally:
   become PNG), 20 MB max. Notes share files by id (duplicate, copy and paste). Notes are only
   soft-deleted, so files are never removed.
 - Display size is Raycast's `min(w, 640, 480·w/h)`, capped to the text width, with 8pt
-| Hide from screen sharing | ⌘K or View menu (no shortcut) |
   corners, 12pt margins (24 between images) and a 2pt secondary-text outline when selected.
 - The attachment only reserves space; `BlockLayoutFragment` draws the bitmap from
   `ImageCache`, which decodes off the main thread with ImageIO at the displayed pixel size
@@ -191,8 +226,9 @@ implements that design locally:
 Package.swift              SwiftPM: the JotKit library, the Jot executable and tests
 Sources/Jot/main.swift     boots NSApplication
 Sources/JotKit/
-  App/      JotApp (app delegate, status item, ⇧⌘N hotkey, jot:// deeplinks),
-            MainMenu (every shortcut), GlobalHotKey (Carbon)
+  App/      JotApp (app delegate, status item, global shortcut, jot:// deeplinks),
+            MainMenu (every shortcut), GlobalHotKey (Carbon), Hotkey (the shortcut, its
+            display and storage, Raycast's Hyper Key)
   Theme/    Theme (the tokens above), Fonts (bundled Inter + JetBrains Mono), RaycastIcon
   Model/    Blocks (the flat block model), TiptapJSON, Markdown + MarkdownImporter, HTML,
             PlainText (Raycast's text and clipboard flavours), ULID
@@ -204,7 +240,8 @@ Sources/JotKit/
             DocumentCodec (attributed string ⇄ blocks), ImageBlock, ImageCache, SlashMenu
   Window/   NotesPanel, NotesWindowController, WindowCornerRadius, GlassRecipe, ScreenSharing,
             Bars (header, footer, find bar), Chrome (buttons, glass pill), Toast,
-            ProgressiveBlur, CommandMenu (⌘K / ⌘P), MenuSearch, SlashMenuPanel, LinkPopover
+            ProgressiveBlur, CommandMenu (⌘K / ⌘P), MenuSearch, SlashMenuPanel, LinkPopover,
+            SettingsWindow
 Tests/JotKitTests          editor behaviour, slash menu, codecs, markdown and plain text
 scripts/bundle.sh          builds Jot.app (LSUIElement) and ad-hoc signs it
 scripts/extract-raycast-icons.py   copies Raycast's icons from your install at build time

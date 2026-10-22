@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import Testing
 @testable import JotKit
 
@@ -440,5 +441,90 @@ struct SlashMenuTests {
         #expect(MenuSearch.score("Code Block", query: "d").isMatch(queryLength: 1) == false)
         #expect(MenuSearch.score("Code Block", query: "cb").isMatch(queryLength: 2))
         #expect(MenuSearch.score("Bullet List", query: "bullet list") == .exact)
+    }
+}
+
+/// "Hide from Screen Sharing" keeps Jot's windows out of captures.
+@MainActor
+struct ScreenSharingTests {
+    @Test func `the toggle excludes open windows from capture and restores them`() {
+        let original = ScreenSharing.isHidden
+        defer { ScreenSharing.isHidden = original }
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 10, height: 10), styleMask: [], backing: .buffered, defer: true)
+        ScreenSharing.isHidden = true
+        ScreenSharing.apply(to: window)
+        #expect(window.sharingType == .none)
+        ScreenSharing.isHidden = false
+        ScreenSharing.apply(to: window)
+        #expect(window.sharingType == .readOnly)
+    }
+}
+
+/// The global shortcut: validity, Raycast-style display, Raycast's Hyper Key, recording.
+@MainActor
+struct HotkeyTests {
+    private func key(_ code: Int, _ modifiers: NSEvent.ModifierFlags = []) -> NSEvent {
+        NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: modifiers, timestamp: 0, windowNumber: 0,
+                         context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: UInt16(code))!
+    }
+
+    @Test func `a shortcut needs command, option or control unless it's a function key`() {
+        #expect(Hotkey.standard.isValid)
+        #expect(!Hotkey(keyCode: UInt32(kVK_ANSI_N), modifiers: [.shift]).isValid)
+        #expect(Hotkey(keyCode: UInt32(kVK_F5), modifiers: []).isValid)
+    }
+
+    @Test func `hyper shows as one keycap`() {
+        #expect(Hotkey.standard.keycaps == ["⇧", "⌘", "N"])
+        #expect(Hotkey(keyCode: UInt32(kVK_ANSI_N), modifiers: Hotkey.hyper).keycaps == ["✦", "N"])
+    }
+
+    @Test func `reads Raycast's hyper key and global hotkey`() throws {
+        let defaults = try #require(UserDefaults(suiteName: "jot.tests.raycast"))
+        defer { defaults.removePersistentDomain(forName: "jot.tests.raycast") }
+        defaults.set(["enabled": 0, "keyCode": 57, "includeShiftKey": 1], forKey: "raycast_hyperKey_state")
+        #expect(HyperKey.raycast(defaults: defaults) == nil)
+        defaults.set(["enabled": 1, "keyCode": 57, "includeShiftKey": 0], forKey: "raycast_hyperKey_state")
+        #expect(HyperKey.raycast(defaults: defaults) == HyperKey.Raycast(keyCode: 57, includesShift: false))
+        #expect(HyperKey.raycast(defaults: defaults)?.keyName == "Caps Lock")
+        defaults.set("Shift-Control-Option-Command-15", forKey: "raycastGlobalHotkey")
+        #expect(HyperKey.raycastGlobalHotkey(defaults: defaults) == Hotkey(keyCode: 15, modifiers: Hotkey.hyper))
+    }
+
+    @Test func `recording saves a valid shortcut, escape cancels and delete removes it`() {
+        let saved = UserDefaults.standard.object(forKey: "globalHotKey")
+        defer { UserDefaults.standard.set(saved, forKey: "globalHotKey") }
+        let model = SettingsModel(hotkey: .standard)
+        var applied: [Hotkey?] = []
+        model.apply = { applied.append($0); return .success(nil) }
+
+        model.toggleRecording()
+        #expect(model.handle(key(kVK_ANSI_J, [.shift])))
+        #expect(model.message != nil)
+        #expect(model.isRecording)
+        #expect(model.handle(key(kVK_ANSI_J, [.control, .option])))
+        #expect(model.hotkey == Hotkey(keyCode: UInt32(kVK_ANSI_J), modifiers: [.control, .option]))
+        #expect(!model.isRecording)
+
+        model.toggleRecording()
+        #expect(model.handle(key(kVK_Escape)))
+        #expect(!model.isRecording)
+        #expect(model.hotkey == Hotkey(keyCode: UInt32(kVK_ANSI_J), modifiers: [.control, .option]))
+
+        model.toggleRecording()
+        #expect(model.handle(key(kVK_Delete)))
+        #expect(model.hotkey == nil)
+        #expect(applied.count == 2)
+    }
+
+    @Test func `a clash still saves the shortcut, with a warning`() {
+        let saved = UserDefaults.standard.object(forKey: "globalHotKey")
+        defer { UserDefaults.standard.set(saved, forKey: "globalHotKey") }
+        let model = SettingsModel(hotkey: .standard)
+        model.apply = { _ in .success(.system) }
+        model.toggleRecording()
+        _ = model.handle(key(kVK_Space, [.command]))
+        #expect(model.hotkey == Hotkey(keyCode: UInt32(kVK_Space), modifiers: [.command]))
+        #expect(model.messageIsWarning)
     }
 }

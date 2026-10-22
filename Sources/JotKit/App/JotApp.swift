@@ -13,6 +13,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controller: NotesWindowController?
     private var statusItem: NSStatusItem?
     private var hotKey: GlobalHotKey?
+    private var settings: SettingsWindowController?
+    private var openItem: NSMenuItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // A menu-bar utility like Raycast (LSUIElement); `swift run` needs this set explicitly.
@@ -34,11 +36,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let controller = NotesWindowController(repository: repository)
         self.controller = controller
         NSApp.mainMenu = MainMenu.build(controller: controller)
-        installStatusItem()
-        hotKey = GlobalHotKey(keyCode: GlobalHotKey.keyN, modifiers: [.command, .shift]) { [weak controller] in
-            controller?.toggle()
+        let hotKey = GlobalHotKey { [weak controller] in controller?.toggle() }
+        if case .failure(let conflict) = hotKey.register(Hotkey.saved) {
+            FileHandle.standardError.write(Data("Jot: couldn't register the global shortcut (\(conflict.message))\n".utf8))
         }
+        self.hotKey = hotKey
+        installSettings(controller: controller)
+        installStatusItem()
         controller.show()
+        if ProcessInfo.processInfo.environment["JOT_OPEN_SETTINGS"] != nil { settings?.show() }
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -63,20 +69,50 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.image = NSImage(systemSymbolName: "note.text", accessibilityDescription: "Jot")
         let menu = NSMenu()
-        let open = NSMenuItem(title: "Open Notes", action: #selector(openNotes), keyEquivalent: "n")
-        open.keyEquivalentModifierMask = [.command, .shift]
+        let open = NSMenuItem(title: "Open Notes", action: #selector(openNotes), keyEquivalent: "")
         open.target = self
         menu.addItem(open)
+        openItem = open
+        updateOpenItemShortcut()
         let new = NSMenuItem(title: "New Note", action: #selector(NotesWindowController.newNote(_:)), keyEquivalent: "")
         new.target = controller
         menu.addItem(new)
         menu.addItem(.separator())
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(showSettings), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
         menu.addItem(NSMenuItem(title: "Quit Jot", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         item.menu = menu
         statusItem = item
     }
 
     @objc private func openNotes() { controller?.show() }
+
+    @objc private func showSettings() { settings?.show() }
+
+    /// Settings changes the global shortcut through the one `GlobalHotKey`.
+    private func installSettings(controller: NotesWindowController) {
+        let model = SettingsModel(hotkey: hotKey?.hotkey)
+        model.apply = { [weak self] hotkey in
+            guard let self, let hotKey else { return .success(nil) }
+            let result = hotKey.register(hotkey)
+            if case .success = result { updateOpenItemShortcut() }
+            return result
+        }
+        model.onRecordingChange = { [weak self] recording in
+            if recording { self?.hotKey?.pause() } else { self?.hotKey?.resume() }
+        }
+        settings = SettingsWindowController(model: model)
+        controller.onShowSettings = { [weak self] in self?.settings?.show() }
+    }
+
+    /// The status menu shows the current global shortcut next to "Open Notes".
+    private func updateOpenItemShortcut() {
+        guard let openItem else { return }
+        let hotkey = hotKey?.hotkey
+        openItem.keyEquivalent = hotkey.map { Hotkey.name(for: $0.keyCode).lowercased() } ?? ""
+        openItem.keyEquivalentModifierMask = hotkey?.modifiers ?? []
+    }
 }
 
 /// First-run note, in the spirit of Raycast's "Welcome to Raycast Notes".

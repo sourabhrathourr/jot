@@ -853,6 +853,10 @@ final class NotesWindowController: NSWindowController, NSWindowDelegate, NSMenuI
         autoSize(animated: true)
     }
 
+    var onShowSettings: (() -> Void)?
+
+    @objc func showSettings(_ sender: Any?) { onShowSettings?() }
+
     /// Keeps Jot out of screen shares, recordings and screenshots (see `ScreenSharing`).
     @objc func toggleScreenSharing(_ sender: Any?) {
         ScreenSharing.isHidden.toggle()
