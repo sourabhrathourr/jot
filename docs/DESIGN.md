@@ -147,7 +147,13 @@ Settings window (⌘,, or Settings… in the menu bar icon) holds:
   When it's on, Settings says which key it is and offers "Use ✦ N". Hyper reaches apps as
   ⌃⌥⇧⌘ (or ⌃⌥⌘ without Shift) whichever tool provides it (Raycast, Karabiner, Hyperkey), so
   those combinations are drawn as one `✦` keycap, like Raycast does.
+- **Open at Login** (`SMAppService`), on by default the first time Jot runs from
+  /Applications, so it's in the menu bar after a restart and the shortcut works right away.
 - **Hide from Screen Sharing** (see above).
+
+Jot stays running in the background until you quit it (⌘Q): ⌘W, Esc and the close button
+only hide the notes window, like the shortcut, and Jot opts out of macOS's automatic
+termination of apps with no windows open.
 
 The shortcut is stored in `UserDefaults` as `globalHotKey` (`keyCode` and modifier flags; a
 `keyCode` of -1 means no shortcut).

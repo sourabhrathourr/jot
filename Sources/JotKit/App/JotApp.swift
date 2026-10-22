@@ -20,6 +20,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // A menu-bar utility like Raycast (LSUIElement); `swift run` needs this set explicitly.
         NSApp.setActivationPolicy(.accessory)
+        // Jot lives in the menu bar and answers its shortcut: only Quit (⌘Q) ends it, never
+        // macOS tidying up an app with no windows open.
+        ProcessInfo.processInfo.disableAutomaticTermination("Jot lives in the menu bar and answers its shortcut")
+        LoginItem.setUpOnFirstLaunch()
         Fonts.registerBundledFonts()
 
         let repository: NotesRepository
@@ -47,6 +51,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.show()
         if ProcessInfo.processInfo.environment["JOT_OPEN_SETTINGS"] != nil { settings?.show() }
     }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         controller?.show()

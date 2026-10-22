@@ -376,6 +376,15 @@ final class NotesWindowController: NSWindowController, NSWindowDelegate, NSMenuI
 
     func windowWillClose(_ notification: Notification) { flush() }
 
+    /// ⌘W and the close button hide the notes window, like ⇧⌘N: Jot keeps running in the
+    /// background with its shortcut ready, until you quit it.
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard sender === panel else { return true }
+        flush()
+        panel.orderOut(nil)
+        return false
+    }
+
     // MARK: Auto-height (Raycast: "height is dynamic until you resize it")
 
     private func autoSize(animated: Bool) {

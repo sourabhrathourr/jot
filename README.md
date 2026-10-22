@@ -52,7 +52,8 @@ make install   # builds Jot.app and copies it to /Applications
 open /Applications/Jot.app
 ```
 
-Jot lives in the menu bar, not the Dock. Press **⇧⌘N** to show or hide it, and open
+Jot lives in the menu bar, not the Dock, and keeps running until you quit it (⌘Q). Closing the
+window just hides it, and it opens at login. Press **⇧⌘N** to show or hide it, and open
 **Settings…** from the menu bar icon or with ⌘, to choose another shortcut.
 
 > Jot's menus use Raycast's icons. If Raycast is installed, the build copies them from your

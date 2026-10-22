@@ -16,6 +16,9 @@ final class SettingsModel {
     /// The message is a warning (the shortcut was still saved), not an error.
     var messageIsWarning = false
     var raycastHyper: HyperKey.Raycast?
+    var opensAtLogin = LoginItem.isEnabled {
+        didSet { if LoginItem.isEnabled != opensAtLogin { LoginItem.setEnabled(opensAtLogin) } }
+    }
     var hidesFromScreenSharing = ScreenSharing.isHidden {
         didSet { if ScreenSharing.isHidden != hidesFromScreenSharing { ScreenSharing.isHidden = hidesFromScreenSharing } }
     }
@@ -33,6 +36,7 @@ final class SettingsModel {
     func refresh() {
         raycastHyper = HyperKey.raycast()
         hidesFromScreenSharing = ScreenSharing.isHidden
+        opensAtLogin = LoginItem.isEnabled
     }
 
     func toggleRecording() {
@@ -213,6 +217,16 @@ private struct SettingsView: View {
                 .padding(.top, 14)
 
             Rectangle().fill(nsColor(Theme.separator)).frame(height: 0.5).padding(.vertical, 18)
+
+            row(title: "Open at Login", detail: LoginItem.needsApproval
+                ? "Allow Jot in System Settings → General → Login Items."
+                : "Keeps Jot ready in the menu bar after a restart.") {
+                Toggle("", isOn: $model.opensAtLogin)
+                    .toggleStyle(.switch)
+                    .tint(nsColor(Theme.accent))
+                    .labelsHidden()
+            }
+            .padding(.bottom, 18)
 
             row(title: "Hide from Screen Sharing", detail: "Keeps Jot out of screen shares, recordings and screenshots.") {
                 Toggle("", isOn: $model.hidesFromScreenSharing)
