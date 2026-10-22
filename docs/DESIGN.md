@@ -175,6 +175,7 @@ implements that design locally:
   become PNG), 20 MB max. Notes share files by id (duplicate, copy and paste). Notes are only
   soft-deleted, so files are never removed.
 - Display size is Raycast's `min(w, 640, 480·w/h)`, capped to the text width, with 8pt
+| Hide from screen sharing | ⌘K or View menu (no shortcut) |
   corners, 12pt margins (24 between images) and a 2pt secondary-text outline when selected.
 - The attachment only reserves space; `BlockLayoutFragment` draws the bitmap from
   `ImageCache`, which decodes off the main thread with ImageIO at the displayed pixel size
@@ -201,7 +202,7 @@ Sources/JotKit/
             EditorStyle (semantic attributes → fonts and paragraph styles),
             BlockLayoutFragment (markers, code backgrounds, quote bars, dividers, images),
             DocumentCodec (attributed string ⇄ blocks), ImageBlock, ImageCache, SlashMenu
-  Window/   NotesPanel, NotesWindowController, WindowCornerRadius, GlassRecipe,
+  Window/   NotesPanel, NotesWindowController, WindowCornerRadius, GlassRecipe, ScreenSharing,
             Bars (header, footer, find bar), Chrome (buttons, glass pill), Toast,
             ProgressiveBlur, CommandMenu (⌘K / ⌘P), MenuSearch, SlashMenuPanel, LinkPopover
 Tests/JotKitTests          editor behaviour, slash menu, codecs, markdown and plain text

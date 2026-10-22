@@ -16,7 +16,7 @@ enum RaycastIcon {
         "magnifying-glass-one": "1.magnifyingglass", "magnifying-glass-plus": "plus.magnifyingglass",
         "magnifying-glass-minus": "minus.magnifyingglass", "cog": "gearshape", "trash": "trash",
         "brand-markdown": "m.square", "code": "chevron.left.forwardslash.chevron.right", "heading": "textformat.size",
-        "x-mark-circle-filled": "xmark.circle.fill", "checkmark": "checkmark", "eye": "eye",
+        "x-mark-circle-filled": "xmark.circle.fill", "checkmark": "checkmark", "eye": "eye", "eye-disabled": "eye.slash",
     ]
 
     /// A template image (tint it with `contentTintColor`) at `size` points.

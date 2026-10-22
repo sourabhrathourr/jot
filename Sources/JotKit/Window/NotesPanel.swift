@@ -32,6 +32,7 @@ final class NotesPanel: NSPanel {
         minSize = Layout.minSize
         collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary]
         animationBehavior = .utilityWindow
+        ScreenSharing.apply(to: self)
     }
 
     override var canBecomeKey: Bool { true }

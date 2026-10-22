@@ -32,6 +32,7 @@ final class LinkPopover: NSObject, NSTextFieldDelegate {
         self.onCommit = onCommit
         field.stringValue = href ?? ""
         popover.show(relativeTo: rect, of: view, preferredEdge: .maxY)
+        if let window = popover.contentViewController?.view.window { ScreenSharing.apply(to: window) }
         popover.contentViewController?.view.window?.makeFirstResponder(field)
     }
 

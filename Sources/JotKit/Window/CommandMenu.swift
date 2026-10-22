@@ -146,6 +146,7 @@ class MenuPanel: NSPanel, CornerRadiusProviding {
         GlassRecipe.apply(to: glass, cornerRadius: cornerRadius)
         contentView = glass
         WindowCornerRadius.install(on: self)
+        ScreenSharing.apply(to: self)
     }
 }
 

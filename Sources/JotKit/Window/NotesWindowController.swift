@@ -618,6 +618,8 @@ final class NotesWindowController: NSWindowController, NSWindowDelegate, NSMenuI
             MenuSection(id: "window-settings", items: [
                 item("toggle-auto-sizing", isAutoSizing ? "Disable Window Auto-Sizing" : "Enable Window Auto-Sizing", "app-window", ["⇧", "⌘", "/"]) { [weak self] in self?.toggleAutoSize(nil) },
                 item("toggle-format-bar", "Toggle Format Bar", "text", ["⌥", "⌘", ","]) { [weak self] in self?.toggleFormatBar(nil) },
+                item("toggle-screen-sharing", ScreenSharing.isHidden ? "Show in Screen Sharing" : "Hide from Screen Sharing",
+                     ScreenSharing.isHidden ? "eye" : "eye-disabled", []) { [weak self] in self?.toggleScreenSharing(nil) },
             ]),
             MenuSection(id: "zoom", items: [
                 item("actual-size", "Actual Size", "magnifying-glass-one", ["⌘", "0"], disabled: zoom == 1) { [weak self] in self?.resetZoom(nil) },
@@ -851,6 +853,12 @@ final class NotesWindowController: NSWindowController, NSWindowDelegate, NSMenuI
         autoSize(animated: true)
     }
 
+    /// Keeps Jot out of screen shares, recordings and screenshots (see `ScreenSharing`).
+    @objc func toggleScreenSharing(_ sender: Any?) {
+        ScreenSharing.isHidden.toggle()
+        showToast(ScreenSharing.isHidden ? "Hidden from Screen Sharing" : "Visible in Screen Sharing")
+    }
+
     // MARK: Find & replace
 
     @objc func showFind(_ sender: Any?) {
@@ -947,6 +955,8 @@ final class NotesWindowController: NSWindowController, NSWindowDelegate, NSMenuI
             menuItem.title = current?.isPinned == true ? "Unpin Note" : "Pin Note"
         case #selector(toggleAutoSize(_:)):
             menuItem.state = isAutoSizing ? .on : .off
+        case #selector(toggleScreenSharing(_:)):
+            menuItem.state = ScreenSharing.isHidden ? .on : .off
         case #selector(toggleFormatBar(_:)):
             menuItem.title = bottomBar.isFormatBarVisible ? "Hide Format Bar" : "Show Format Bar"
         case #selector(resetZoom(_:)):

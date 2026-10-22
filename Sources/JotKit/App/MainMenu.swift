@@ -97,6 +97,7 @@ enum MainMenu {
             item("Auto-Size Window", #selector(C.toggleAutoSize(_:)), "/", [.command, .shift]),
             sep(),
             item("Zoom In", #selector(C.zoomIn(_:)), "="),
+            item("Hide from Screen Sharing", #selector(C.toggleScreenSharing(_:))),
             item("Zoom Out", #selector(C.zoomOut(_:)), "-"),
             item("Actual Size", #selector(C.resetZoom(_:)), "0"),
         ])

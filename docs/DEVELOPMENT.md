@@ -60,6 +60,9 @@ JOT_DB=/tmp/jot-test.db JOT_EMPTY=1 JOT_OPEN_MENU=/ build/Jot.app/Contents/MacOS
 | `JOT_NO_HEADER_BLUR=1` | leave out the header's progressive blur (A/B comparisons) |
 
 ## Screenshots without touching your screen
+Any `UserDefaults` key can be overridden for one run with a launch argument, without changing
+your saved settings, for example `-hideFromScreenSharing YES`.
+
 
 `screencapture -l <window id>` (or `-R x,y,w,h` for a window and its menus) captures Jot's
 windows while you keep working. Combine it with the flags above, for example
