@@ -26,7 +26,7 @@ export function Landing() {
   const download = useCallback(() => {
     setDownloading(true);
     window.setTimeout(() => setDownloading(false), 180);
-    showToast("Opening GitHub…");
+    showToast("Downloading Jot…");
     window.location.href = downloadUrl;
   }, [showToast]);
 
