@@ -1,0 +1,7 @@
+name: jot-website
+
+services:
+  web:
+    cmd: pnpm dev --port $PORT
+    port: 3000
+    ready: "Ready in"
